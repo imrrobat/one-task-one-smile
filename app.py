@@ -19,8 +19,18 @@ body, .q-layout, .q-page-container, .q-page {
 
 with ui.row().style('width: 100%; height: 100vh;'):
     # dashboard
-    with ui.column().style('flex: 1; padding: 16px;'):
-        ui.label('➕ Add Task (1/3)')
+    with ui.column().style('flex: 1; padding: 16px; border: 1px solid #ddd;'):
+        ui.label('وضعیت کلی')
+        ui.input('عنوان تسک').classes('w-full').props('dense outlined')
+        
+        cats = ['کار', 'رشد فردی و زندگی','تفریح و استراحت']
+        category = ui.select(cats).classes('w-full')
+        
+        # slider = ui.slider(min=0, max=10, value=5,step=1, on_change=lambda e:ui.notify(f'اهمیت {e.value}/10',type='info'))
+        slider = ui.slider(min=0, max=10, value=5,step=1)
+        ui.label().bind_text_from(slider,'value')
+        
+        
     
     #task view
     with ui.column().style('flex: 2; border: 1px solid #ddd; padding: 16px;'):
