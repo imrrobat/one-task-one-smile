@@ -39,7 +39,20 @@ with ui.row().style('width: 100%; height: 100vh;'):
     
     #task view
     with ui.column().style('flex: 4; border: 1px solid #ddd; padding: 16px;'):
-        ui.label('📋 Task List (2/3)')
+        with ui.row().classes('w-full gap-4'):  # ردیف کارت‌ها
+            with ui.card().props('flat').style('flex: 1;border: 1px solid #ddd; display: flex; flex-direction: column; justify-content: center; padding: 16px;'):
+                ui.label('کارت')
+                ui.label('توضیحات کارت...')
+            with ui.card().props('flat').style('flex: 1;border: 1px solid #ddd; display: flex; flex-direction: column; justify-content: center; padding: 16px;'):
+                ui.label('کارت')
+                ui.label('توضیحات کارت...')
+            with ui.card().props('flat').style('flex: 1;border: 1px solid #ddd; display: flex; flex-direction: column; justify-content: center; padding: 16px;'):
+                ui.label('کارت')
+                ui.label('توضیحات کارت...')
+
+                    
+
+        
     
 
 ui.run(title='OTOS')
