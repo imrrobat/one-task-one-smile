@@ -5,6 +5,7 @@ from utils import mark_task_done,update_data
 from utils import load_data_file,summary_info
 from utils import today_log
 
+
 ui.add_head_html('''
 <link href="https://cdn.jsdelivr.net/npm/vazir-font@30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
 
@@ -85,7 +86,7 @@ with ui.row().style('width: 100%; height: 100vh;'):
         info_view()
         
         ui.separator()
-        ui.label('افزودن تسک').style('font-weight:bold;')
+        ui.label('افزودن تسک').style('font-weight:bold;').props('required')
         new_task = ui.input('عنوان تسک').classes('w-full').props('dense outlined')
         
         cats = ['کار', 'رشد فردی و زندگی','تفریح و استراحت']
@@ -145,7 +146,8 @@ with ui.row().style('width: 100%; height: 100vh;'):
                                 ui.button(icon='remove',on_click=lambda e,title=title:remove_a_task(title.text)).props('dense color=ghermez size=xs')
 
             task_view() 
-        ui.link('پیشرفت روز', 'http://127.0.0.1:8080/today')                  
+        ui.link('پیشرفت روز', 'http://127.0.0.1:8083/today')                  
+
 
 @ui.page('/today')
 def today():
@@ -211,5 +213,7 @@ def today():
                     ui.label(f'✅ {item['title']}')
             else:
                 ui.label(f'امروز تفریحی انجام نشده 💔')
+    ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/')
+
              
-ui.run(title='OTOS')
+ui.run(title='OTOS',port=8083)

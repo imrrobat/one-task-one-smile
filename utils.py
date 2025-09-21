@@ -22,12 +22,12 @@ def summary_info():
         reader = csv.DictReader(f)
         for row in reader:
             if row["is_done"].lower() != "true":
-                continue  # فقط تسک‌های انجام شده
+                continue 
 
             try:
                 priority = int(row["priority"])
             except ValueError:
-                continue  # اگر مقدار عددی نبود رد کن
+                continue  
 
             total += priority
 
@@ -79,7 +79,7 @@ def add_task(title: str, priority: int, category: str):
         writer = csv.writer(f)
         writer.writerow([new_id, title, category, priority, False, ""])
 
-    print(f"✅ Task {new_id} added: {title}")
+    print(f"✅ Task {new_id} added.")
 
 def mark_task_done(title: str, done_date_str: str):
     if not os.path.exists(task_file):
@@ -105,10 +105,10 @@ def mark_task_done(title: str, done_date_str: str):
         writer.writerows(tasks)
 
     if updated:
-        print(f"✅ Task '{title}' marked as done")
+        print(f"✅ Task marked as done")
         return True
     else:
-        print(f"Task '{title}' not found")
+        print(f"Task not found")
         return False
 
 def get_task(title: str):
@@ -176,14 +176,12 @@ def load_data_file():
     return data_dict
 
 def update_data(score_inc=0, count_tasks_inc=0):
-    # اگر فایل وجود نداشت، بساز و مقدار اولیه 0 بذار
     if not os.path.exists(data_file):
         with open(data_file, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(["score", "count_tasks"])
             writer.writerow([0, 0])
 
-    # خوندن داده فعلی
     data_dict = {}
     with open(data_file, mode="r", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -196,13 +194,11 @@ def update_data(score_inc=0, count_tasks_inc=0):
                 data_dict["count_tasks"] = int(row["count_tasks"])
             except ValueError:
                 data_dict["count_tasks"] = 0
-            break  # فقط اولین ردیف
+            break 
 
-    # افزودن مقادیر
     data_dict["score"] += score_inc
     data_dict["count_tasks"] += count_tasks_inc
 
-    # بازنویسی فایل
     with open(data_file, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["score", "count_tasks"])
         writer.writeheader()
