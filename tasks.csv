@@ -6,5 +6,7 @@ id,title,category,priority,is_done,done_date
 5,ادیت قسمت چهارم دوره هوش مصنوعی,work,8,False,
 6,ساخت لیبل برای کا پی گالری,work,3,False,
 7,یک ربع مطالعه کتاب تاروت,fun,4,False,
-8,ناهار خوردن,life,5,False,
-9,پاسخ به دانشجویان,work,10,False,
+8,ناهار خوردن,life,6,True,1404-06-30
+9,کار روی پروژه OTOS,fun,4,True,1404-06-30
+10,پاسخ به دانشجویان,work,10,False,
+11,کلاس ویولن,life,7,False,
