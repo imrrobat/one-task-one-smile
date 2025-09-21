@@ -39,7 +39,6 @@ def submit_task():
     category.value = cats[0]
     
     task_view.refresh()
-    print('added')
  
 def done_a_task(title):
     print('salam')
@@ -144,8 +143,7 @@ with ui.row().style('width: 100%; height: 100vh;'):
                                 ui.button(icon='done',on_click=lambda e,title=title:done_a_task(title.text)).props('dense color=sabz size=xs')
                                 ui.button(icon='remove',on_click=lambda e,title=title:remove_a_task(title.text)).props('dense color=ghermez size=xs')
 
-            task_view() 
-        ui.link('پیشرفت روز', 'http://127.0.0.1:8080/today')                  
+            task_view()                   
 
 @ui.page('/today')
 def today():
