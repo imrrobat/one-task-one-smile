@@ -40,10 +40,8 @@ def submit_task():
     category.value = cats[0]
     
     task_view.refresh()
-    print('added')
  
 def done_a_task(title):
-    print('salam')
     now = jdt.datetime.now()
     date = f'{now.year}-{now.month:02d}-{now.day:02d}'
     
@@ -216,4 +214,4 @@ def today():
     ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/')
 
              
-ui.run(title='OTOS',port=8083)
+ui.run(title='OTOS',port=8083, favicon='otos.png')

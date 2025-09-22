@@ -80,7 +80,7 @@ def add_task(title: str, priority: int, category: str):
         writer.writerow([new_id, title, category, priority, False, ""])
 
     print(f"✅ Task {new_id} added.")
-
+    
 def mark_task_done(title: str, done_date_str: str):
     if not os.path.exists(task_file):
         print("File does not exist")
@@ -93,7 +93,7 @@ def mark_task_done(title: str, done_date_str: str):
         reader = csv.DictReader(f)
         headers = reader.fieldnames
         for row in reader:
-            if row["title"] == title and not updated:
+            if row["title"] == title and row["is_done"] == "False" and not updated:
                 row["is_done"] = "True"
                 row["done_date"] = done_date_str
                 updated = True
@@ -108,7 +108,7 @@ def mark_task_done(title: str, done_date_str: str):
         print(f"✅ Task marked as done")
         return True
     else:
-        print(f"Task not found")
+        print(f"Task not found or already done")
         return False
 
 def get_task(title: str):
@@ -158,9 +158,9 @@ def load_data_file():
     if not os.path.exists(data_file):
         with open(data_file, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
-            writer.writerow(["score"])
-            writer.writerow([0])
-        return {"all_smiles": 0}
+            writer.writerow(["score", "count_tasks"])
+            writer.writerow([0, 0])
+        return {"score": 0, "count_tasks": 0}
 
     data_dict = {}
     with open(data_file, mode="r", newline="", encoding="utf-8") as f:
@@ -171,9 +171,9 @@ def load_data_file():
                     data_dict[key] = int(value)
                 except ValueError:
                     data_dict[key] = value
-            break
-
+            break 
     return data_dict
+
 
 def update_data(score_inc=0, count_tasks_inc=0):
     if not os.path.exists(data_file):
