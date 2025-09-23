@@ -4,28 +4,28 @@ from utils import load_tasks,add_task,get_task,delete_task
 from utils import mark_task_done,update_data
 from utils import load_data_file,summary_info
 from utils import today_log
+from snip import farsi_rtl
 
+dark_on = False
 
-ui.add_head_html('''
-<link href="https://cdn.jsdelivr.net/npm/vazir-font@30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+ui.add_head_html(farsi_rtl)
 
-<style>
-body, .q-layout, .q-page-container, .q-page {
-    direction: rtl !important;
-    text-align: right !important;
-    font-family: Vazir, sans-serif !important; 
-}
+ui.colors(asli="#36BA98",ghermez="#E62727",sabz="#08CB00",purple="#9112BC",yellow="#FFD93D")
 
+def toggle_dark():
+    global dark_on
+    if dark_on:
+        ui.dark_mode(False)
+        dark_on = False
+        toggle_btn.props('color=purple').classes(remove='text-black', add='text-white')
+    else:
+        ui.dark_mode(True)
+        dark_on = True
+        toggle_btn.props('color=yellow').classes(remove='text-white', add='text-black')
 
-.q-btn, .q-input, .q-field__native, .q-table, .q-card, .q-toolbar {
-    font-family: Vazir, sans-serif !important;
-}
-</style>
-''')
-
-ui.colors(asli="#36BA98",ghermez="#E62727",sabz="#08CB00")
-# ui.dark_mode(True)
-
+toggle_btn = ui.button(icon='bedtime', on_click=toggle_dark).classes(
+    'fixed bottom-4 left-4 text-white'
+).props('color=purple')
 
 def submit_task():
     if category.value == cats[0]:
@@ -144,30 +144,36 @@ with ui.row().style('width: 100%; height: 100vh;'):
                                 ui.button(icon='remove',on_click=lambda e,title=title:remove_a_task(title.text)).props('dense color=ghermez size=xs')
 
             task_view() 
-        ui.link('پیشرفت روز', 'http://127.0.0.1:8083/today')                  
+        
+        ui.link('پیشرفت روز', 'http://127.0.0.1:8083/today').classes(
+    'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
+)             
+        ui.link('مشاهده آمار', 'http://127.0.0.1:8083/stat').classes(
+    'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-yellow text-black'
+)                 
 
 
 @ui.page('/today')
 def today():
-    ui.add_head_html('''
-        <link href="https://cdn.jsdelivr.net/npm/vazir-font@30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+    ui.add_head_html(farsi_rtl)
 
-        <style>
-        body, .q-layout, .q-page-container, .q-page {
-            direction: rtl !important;
-            text-align: right !important;
-            font-family: Vazir, sans-serif !important; 
-        }
+    ui.colors(asli="#36BA98",ghermez="#E62727",sabz="#08CB00",purple="#9112BC",yellow="#FFD93D")
 
+    def toggle_dark():
+        global dark_on
+        if dark_on:
+            ui.dark_mode(False)
+            dark_on = False
+            toggle_btn.props('color=purple').classes(remove='text-black', add='text-white')
+        else:
+            ui.dark_mode(True)
+            dark_on = True
+            toggle_btn.props('color=yellow').classes(remove='text-white', add='text-black')
 
-        .q-btn, .q-input, .q-field__native, .q-table, .q-card, .q-toolbar {
-            font-family: Vazir, sans-serif !important;
-        }
-        </style>
-        ''')
+    toggle_btn = ui.button(icon='bedtime', on_click=toggle_dark).classes(
+        'fixed bottom-4 left-4 text-white'
+    ).props('color=purple')
 
-    ui.colors(asli="#36BA98",ghermez="#E62727",sabz="#08CB00")
-    # ui.dark_mode(True)
     today = jdt.datetime.now()
     day = f'{today.year}-{today.month:02d}-{today.day:02d}'
     log = today_log(day)
@@ -211,7 +217,33 @@ def today():
                     ui.label(f'✅ {item['title']}')
             else:
                 ui.label(f'امروز تفریحی انجام نشده 💔')
-    ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/')
+    ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/').classes(
+    'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
+) 
 
+@ui.page('/stat')
+def stat():
+    ui.add_head_html(farsi_rtl)
+    ui.colors(asli="#36BA98",ghermez="#E62727",sabz="#08CB00",purple="#9112BC",yellow="#FFD93D")
+
+    def toggle_dark():
+        global dark_on
+        if dark_on:
+            ui.dark_mode(False)
+            dark_on = False
+            toggle_btn.props('color=purple').classes(remove='text-black', add='text-white')
+        else:
+            ui.dark_mode(True)
+            dark_on = True
+            toggle_btn.props('color=yellow').classes(remove='text-white', add='text-black')
+
+    toggle_btn = ui.button(icon='bedtime', on_click=toggle_dark).classes(
+        'fixed bottom-4 left-4 text-white'
+    ).props('color=purple')
+
+    
+    ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/').classes(
+    'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
+) 
              
 ui.run(title='OTOS',port=8083, favicon='otos.png')
