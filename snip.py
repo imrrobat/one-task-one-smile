@@ -14,3 +14,4 @@ farsi_rtl = '''
         }
         </style>
         '''
+no_scroll = '<style>body { overflow: hidden; }</style>'

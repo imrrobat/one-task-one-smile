@@ -3,11 +3,12 @@ import jdatetime as jdt
 from utils import load_tasks,add_task,get_task,delete_task
 from utils import mark_task_done,update_data
 from utils import load_data_file,summary_info
-from utils import today_log
-from snip import farsi_rtl
+from utils import today_log,get_rank
+from snip import farsi_rtl,no_scroll
 
 dark_on = False
 
+ui.add_head_html(no_scroll)
 ui.add_head_html(farsi_rtl)
 
 ui.colors(asli="#36BA98",ghermez="#E62727",sabz="#08CB00",purple="#9112BC",yellow="#FFD93D")
@@ -65,14 +66,18 @@ def remove_a_task(title):
 with ui.row().style('width: 100%; height: 100vh;'):
     # dashboard
     with ui.column().style('flex: 1; padding: 16px; border: 1px solid #ddd;').classes('h-full'):
-        today = jdt.datetime.now()
-        ui.label(f'امروز: {today.year}/{today.month}/{today.day}').style('font-weight:bold;')
-        ui.separator()
         @ui.refreshable
         def info_view():
+            today = jdt.datetime.now()
             info = load_data_file()
             summary = summary_info()
             
+            with ui.row().classes('gap-1'):
+                rank = get_rank(info['score'])
+                ui.label(f'سلام {rank}').style('font-weight:bold;')
+                ui.label(f'امروز: {today.year}/{today.month}/{today.day}').style('font-weight:bold;')
+                
+            ui.separator()
             with ui.row().classes('gap-1'):
                 ui.label('وضعیت کلی:').style('font-weight:bold;')
                 ui.label(f'امتیاز: {info['score']} |')

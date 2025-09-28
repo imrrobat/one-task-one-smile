@@ -218,3 +218,23 @@ def today_log(date_str: str):
                 tasks.append(row)
 
     return tasks
+
+def get_rank(score):
+    if score >= 12000:
+        return "شاه سیاه!"
+    elif score >= 8000:
+        return "شاه!"
+    elif score >= 6000:
+        return "وزیر!"
+    elif score >= 5000:
+        return "رخ دیوانه!"
+    elif score >= 3500:
+        return "رخ!"
+    elif score >= 2500:
+        return "راهب!"
+    elif score >= 1500:
+        return "شوالیه!"
+    elif score >= 1000:
+        return "سرباز!"
+    else:
+        return "پرنسس!"
