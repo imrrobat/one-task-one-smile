@@ -1,17 +1,18 @@
-from nicegui import ui 
+from nicegui import ui, native
 import jdatetime as jdt
 from utils import load_tasks,add_task,get_task,delete_task
 from utils import mark_task_done,update_data
 from utils import load_data_file,summary_info
 from utils import today_log,get_rank
 from snip import farsi_rtl,no_scroll
+import sys 
 
 dark_on = False
 
 ui.add_head_html(no_scroll)
 ui.add_head_html(farsi_rtl)
 
-ui.colors(asli="#36BA98",ghermez="#E62727",sabz="#08CB00",purple="#9112BC",yellow="#FFD93D")
+ui.colors(asli="#BE1D1D",ghermez="#E62727",sabz="#08CB00",purple="#9112BC",yellow="#FFD93D")
 
 def toggle_dark():
     global dark_on
@@ -26,7 +27,7 @@ def toggle_dark():
 
 toggle_btn = ui.button(icon='bedtime', on_click=toggle_dark).classes(
     'fixed bottom-4 left-4 text-white'
-).props('color=purple')
+).props('color=purple round')
 
 def submit_task():
     if category.value == cats[0]:
@@ -81,7 +82,7 @@ with ui.row().style('width: 100%; height: 100vh;'):
             with ui.row().classes('gap-1'):
                 ui.label('وضعیت کلی:').style('font-weight:bold;')
                 ui.label(f'امتیاز: {info['score']} |')
-                ui.label(f'کل تسک ها: {info['count_tasks']}')
+                ui.label(f'تسک ها: {info['count_tasks']}')
                 
             ui.label(f'تعداد کل لبخندها: {summary['total']}')
             ui.label(f'لبخندهای این ماه: {summary['month_total']}')
@@ -101,6 +102,13 @@ with ui.row().style('width: 100%; height: 100vh;'):
             ui.label('اهمیت:')
             ui.label().bind_text_from(priority,'value')
         ui.button(text="ثبت کار",on_click=submit_task).classes('w-full').props('color=asli')
+        ui.button(text="کی ساخته؟",on_click=lambda e:ui.notify("علی حیدری (آقای ربات)"))\
+            .classes('w-full')\
+            .props('color=green-3')
+            
+        ui.button(text="بستن برنامه",on_click=lambda e:sys.exit())\
+            .classes('w-full')\
+            .props('color=grey-14')
         
     
     #task view
@@ -177,9 +185,99 @@ def today():
 
     toggle_btn = ui.button(icon='bedtime', on_click=toggle_dark).classes(
         'fixed bottom-4 left-4 text-white'
-    ).props('color=purple')
+    ).props('color=purple round')
 
     today = jdt.datetime.now()
+    day = f'{today.year}-{today.month:02d}-{today.day:02d}'
+    log = today_log(day)
+    
+    count_smile = 0
+    
+    for item in log:
+        count_smile += int(item['priority'])
+    
+    yesterday = today - jdt.timedelta(days=1)
+    yesterday_str = f'{yesterday.year}-{yesterday.month:02d}-{yesterday.day:02d}'
+    
+    yesterday_log = today_log(yesterday_str)
+    count_smile_yesterday = 0
+    
+    for item in yesterday_log:
+        count_smile_yesterday += int(item['priority'])
+    
+    change_percent = (count_smile - count_smile_yesterday) / count_smile_yesterday * 100
+    
+
+    
+    with ui.row():
+        ui.label(f'گزارش امروز {today.year}/{today.month}/{today.day}').style('font-weight:bold;')
+        ui.label(f'لبخندهای کسب شده: {count_smile}').style('font-weight:bold;')
+        
+        if change_percent > 0:
+            ui.label(f"امروز نسبت به دیروز {change_percent:.1f}% بهتر بودی").style('font-weight:bold; color:#08CB00;')
+        elif change_percent < 0:
+            ui.label(f"امروز نسبت به دیروز {abs(change_percent):.1f}% بدتر بودی").style('font-weight:bold; color:#E62727;')
+        else:
+            ui.label("هیچ تغییری نسبت به دیروز نداشتی").style('font-weight:bold;')
+    
+    with ui.row().style('width: 100%; gap: 8px;'):
+        with ui.column().style('flex: 1; border: 1px solid #ccc; padding: 8px;'):
+            work_today = [item for item in log if item['category']=='work']
+            ui.label('کار').style('font-weight:bold;')
+            ui.separator()
+            if work_today:
+                for item in work_today:
+                    ui.label(f'✅ {item['title']}')
+            else:
+                ui.label(f'امروز کاری انجام نشده 💔')
+                
+        with ui.column().style('flex: 1; border: 1px solid #ccc; padding: 8px;'):
+            life_today = [item for item in log if item['category']=='life']
+            ui.label('زندگی و رشد فردی').style('font-weight:bold;')
+            ui.separator()
+            if life_today:
+                for item in life_today:
+                    ui.label(f'✅ {item['title']}')
+            else:
+                ui.label(f'امروز رشد فردی نداشتیم 💔')
+            
+                
+        with ui.column().style('flex: 1; border: 1px solid #ccc; padding: 8px;'):
+            fun_today = [item for item in log if item['category']=='fun']
+            ui.label('استراحت و تفریح').style('font-weight:bold;')
+            ui.separator()
+            if fun_today:
+                for item in fun_today:
+                    ui.label(f'✅ {item['title']}')
+            else:
+                ui.label(f'امروز تفریحی انجام نشده 💔')
+    ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/').classes(
+    'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
+) 
+    
+
+@ui.page('/yesterday')
+def today():
+    ui.add_head_html(farsi_rtl)
+
+    ui.colors(asli="#36BA98",ghermez="#E62727",sabz="#08CB00",purple="#9112BC",yellow="#FFD93D")
+
+    def toggle_dark():
+        global dark_on
+        if dark_on:
+            ui.dark_mode(False)
+            dark_on = False
+            toggle_btn.props('color=purple').classes(remove='text-black', add='text-white')
+        else:
+            ui.dark_mode(True)
+            dark_on = True
+            toggle_btn.props('color=yellow').classes(remove='text-white', add='text-black')
+
+    toggle_btn = ui.button(icon='bedtime', on_click=toggle_dark).classes(
+        'fixed bottom-4 left-4 text-white'
+    ).props('color=purple round')
+
+    today = jdt.datetime.now() - jdt.timedelta(1)
     day = f'{today.year}-{today.month:02d}-{today.day:02d}'
     log = today_log(day)
     
@@ -265,7 +363,7 @@ def stat():
 
     toggle_btn = ui.button(icon='bedtime', on_click=toggle_dark).classes(
         'fixed bottom-4 left-4 text-white'
-    ).props('color=purple')
+    ).props('color=purple round')
 
     ui.markdown('###آمار 10 روز قبل')
     
@@ -288,4 +386,5 @@ def stat():
     'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
 ) 
              
-ui.run(title='OTOS',port=8083, favicon='otos.png')
+# ui.run(title='OTOS',port=8083, favicon='otos.png')
+ui.run(title='OTOS',favicon='otos.png',native=True,fullscreen=True,reload=False, port=native.find_open_port() )
