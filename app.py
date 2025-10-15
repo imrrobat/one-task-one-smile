@@ -1,11 +1,13 @@
-from nicegui import ui, native
+from nicegui import ui, app, native
 import jdatetime as jdt
 from utils import load_tasks,add_task,get_task,delete_task
 from utils import mark_task_done,update_data
 from utils import load_data_file,summary_info
 from utils import today_log,get_rank
 from snip import farsi_rtl,no_scroll
-import sys 
+
+app.native.window_args['maximized'] = True
+app_port = native.find_open_port()
 
 dark_on = False
 
@@ -102,13 +104,10 @@ with ui.row().style('width: 100%; height: 100vh;'):
             ui.label('اهمیت:')
             ui.label().bind_text_from(priority,'value')
         ui.button(text="ثبت کار",on_click=submit_task).classes('w-full').props('color=asli')
-        ui.button(text="کی ساخته؟",on_click=lambda e:ui.notify("علی حیدری (آقای ربات)"))\
+        ui.button(text="اینو کی ساخته؟",on_click=lambda e:ui.notify("علی حیدری (آقای ربات)"))\
             .classes('w-full')\
             .props('color=green-3')
-            
-        ui.button(text="بستن برنامه",on_click=lambda e:sys.exit())\
-            .classes('w-full')\
-            .props('color=grey-14')
+        
         
     
     #task view
@@ -158,10 +157,10 @@ with ui.row().style('width: 100%; height: 100vh;'):
 
             task_view() 
         
-        ui.link('پیشرفت روز', 'http://127.0.0.1:8083/today').classes(
+        ui.link('پیشرفت روز', f'http://127.0.0.1:{app_port}/today').classes(
     'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
 )             
-        ui.link('مشاهده آمار', 'http://127.0.0.1:8083/stat').classes(
+        ui.link('مشاهده آمار', f'http://127.0.0.1:{app_port}/stat').classes(
     'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-yellow text-black'
 )                 
 
@@ -205,7 +204,10 @@ def today():
     for item in yesterday_log:
         count_smile_yesterday += int(item['priority'])
     
-    change_percent = (count_smile - count_smile_yesterday) / count_smile_yesterday * 100
+    try:
+        change_percent = (count_smile - count_smile_yesterday) / count_smile_yesterday * 100
+    except Exception:
+        change_percent = 0 
     
 
     
@@ -251,7 +253,7 @@ def today():
                     ui.label(f'✅ {item['title']}')
             else:
                 ui.label(f'امروز تفریحی انجام نشده 💔')
-    ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/').classes(
+    ui.link('بازگشت به صفحه اصلی',f'http://127.0.0.1:{app_port}/').classes(
     'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
 ) 
     
@@ -295,9 +297,10 @@ def today():
     for item in yesterday_log:
         count_smile_yesterday += int(item['priority'])
     
-    change_percent = (count_smile - count_smile_yesterday) / count_smile_yesterday * 100
-    
-
+    try:
+        change_percent = (count_smile - count_smile_yesterday) / count_smile_yesterday * 100
+    except:
+        change_percent = 0
     
     with ui.row():
         ui.label(f'گزارش امروز {today.year}/{today.month}/{today.day}').style('font-weight:bold;')
@@ -341,7 +344,7 @@ def today():
                     ui.label(f'✅ {item['title']}')
             else:
                 ui.label(f'امروز تفریحی انجام نشده 💔')
-    ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/').classes(
+    ui.link('بازگشت به صفحه اصلی',f'http://127.0.0.1:{app_port}/').classes(
     'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
 ) 
 
@@ -365,26 +368,66 @@ def stat():
         'fixed bottom-4 left-4 text-white'
     ).props('color=purple round')
 
-    ui.markdown('###آمار 10 روز قبل')
     
     today = jdt.datetime.now()
 
     last_10_days = []
+    stat = {}
+    
+    ui.markdown('###آمار 10 روز قبل')
     
     for i in range(10):
         day = today - jdt.timedelta(days=i)
         day_str = f'{day.year}-{day.month:02d}-{day.day:02d}'
         last_10_days.append(day_str)
     
-    for day in last_10_days:
-        day_log = today_log(day)
-        smile_count = sum(int(item['priority']) for item in day_log)
-        ui.label(f'روز {day} - لبخندها {smile_count}')
-
+    with ui.row().classes('w-full').style('align-items: stretch; height: 100%;'):
+        with ui.column().classes('p-2').style('flex:1;border:1px solid;border-radius:5px;'):
+            for day in last_10_days:
+                day_log = today_log(day)
+                smile_count = sum(int(item['priority']) for item in day_log)
+                ui.label(f'روز {day} - لبخندها {smile_count}')
+                
+                stat[day] = smile_count
+        with ui.column().style('flex:4;border:1px solid;border-radius:5px;'):
+            ui.echart({
+                'xAxis': {
+                    'type': 'category',
+                    'data': list(stat.keys()),
+                    'axisLabel': {'rotate': 45},
+                },
+                'yAxis': {'type': 'value'},
+                'tooltip': {'trigger': 'axis'},
+                'grid': {'bottom': 70, 'left': 50, 'right': 20, 'top': 40},
+                'series': [
+                    {
+                        'data': list(stat.values()),
+                        'type': 'bar',
+                        'itemStyle': {'color': "#A434BB"},
+                        'barWidth': '30%',
+                    },
+                    {
+                        'data': list(stat.values()),
+                        'type': 'line',
+                        'symbol': 'circle',
+                        'symbolSize': 8,
+                        'lineStyle': {'color': "#4CAF50", 'width': 2},
+                        'itemStyle': {'color': "#DA7E14"},
+                        'smooth': True, 
+                    },
+                ],
+            }).style('align-items: stretch; height: 100%;')
+            
     
-    ui.link('بازگشت به صفحه اصلی','http://127.0.0.1:8083/').classes(
+    
+    ui.link('بازگشت به صفحه اصلی',f'http://127.0.0.1:{app_port}/').classes(
     'q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle bg-purple text-white'
 ) 
              
-# ui.run(title='OTOS',port=8083, favicon='otos.png')
-ui.run(title='OTOS',favicon='otos.png',native=True,fullscreen=True,reload=False, port=native.find_open_port() )
+# ui.run(title='OTOS',port={app_port}, favicon='otos.png')
+ui.run(
+    title='OTOS',
+    port=app_port,
+    # reload=False,
+    # native=True
+)
