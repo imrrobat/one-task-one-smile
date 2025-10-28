@@ -7,9 +7,8 @@ data_file = "data.csv"
 
 def summary_info():
     if not os.path.exists(task_file):
-        return {"total": 0, "month_total": 0, "today_total": 0}
+        return {"month_total": 0, "today_total": 0}
 
-    total = 0
     month_total = 0
     today_total = 0
 
@@ -29,8 +28,6 @@ def summary_info():
             except ValueError:
                 continue  
 
-            total += priority
-
             done_date_str = row["done_date"].strip()
             if done_date_str:
                 try:
@@ -42,10 +39,10 @@ def summary_info():
                 except Exception:
                     continue 
 
-    return {"total": total, "month_total": month_total, "today_total": today_total}
+    return {"month_total": month_total, "today_total": today_total}
 
 def load_tasks():
-    headers = ["id", "title", "category", "priority", "is_done", "done_date"]
+    headers = ["id", "title", "category", "priority", "date","is_done", "done_date"]
 
     if not os.path.exists(task_file):
         with open(task_file, mode="w", newline="", encoding="utf-8") as f:
@@ -61,11 +58,11 @@ def load_tasks():
 
     return tasks
 
-def add_task(title: str, priority: int, category: str):
+def add_task(title: str, priority: int, category: str, date:str):
     if not os.path.exists(task_file):
         with open(task_file, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
-            writer.writerow(["id", "title", "category", "priority", "is_done", "done_date"])
+            writer.writerow(["id", "title", "category", "priority", "date", "is_done", "done_date"])
             
     last_id = 0
     with open(task_file, mode="r", newline="", encoding="utf-8") as f:
@@ -77,7 +74,7 @@ def add_task(title: str, priority: int, category: str):
 
     with open(task_file, mode="a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow([new_id, title, category, priority, False, ""])
+        writer.writerow([new_id, title, category, priority, date, False, ""])
 
     print(f"✅ Task {new_id} added.")
     
